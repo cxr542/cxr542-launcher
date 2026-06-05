@@ -1,1373 +1,403 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cxr542 Workspace — 팀장 런처</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      :root {
-        --oke-blue: #006dff;
-        --oke-navy: #00187a;
-        --oke-orange: #f15928;
-        --portal: #0d9668;
-        --portal-soft: #ecfdf5;
-        --tms-soft: #eff6ff;
-        --lab: #7c3aed;
-        --lab-soft: #f5f3ff;
-        --public: #64748b;
-        --bg: #f8fafc;
-        --surface: #ffffff;
-        --text: #0f172a;
-        --muted: #64748b;
-        --border: rgba(15, 23, 42, 0.08);
-        --shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.06);
-        --shadow-lg: 0 24px 64px rgba(15, 23, 42, 0.1);
-        --font: "IBM Plex Sans", system-ui, sans-serif;
-        --display: "Instrument Serif", Georgia, serif;
-        --radius: 16px;
-        --nav-h: 64px;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      html {
-        scroll-behavior: smooth;
-      }
-
-      body {
-        margin: 0;
-        font-family: var(--font);
-        font-size: 15px;
-        line-height: 1.55;
-        color: var(--text);
-        background: var(--bg);
-      }
-
-      /* ── Leader gate (mock auth) ── */
-      .gate {
-        position: fixed;
-        inset: 0;
-        z-index: 1000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 1.5rem;
-        background: radial-gradient(900px 500px at 20% 0%, rgba(0, 109, 255, 0.12), transparent),
-          radial-gradient(700px 400px at 80% 100%, rgba(241, 89, 40, 0.08), transparent),
-          #f1f5f9;
-        transition: opacity 0.35s ease, visibility 0.35s ease;
-      }
-
-      .gate.is-hidden {
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-      }
-
-      .gate-card {
-        width: min(440px, 100%);
-        padding: 2rem 2rem 1.75rem;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 20px;
-        box-shadow: var(--shadow-lg);
-        text-align: center;
-      }
-
-      .gate-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-        padding: 0.3rem 0.75rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: var(--oke-navy);
-        background: var(--tms-soft);
-        border-radius: 999px;
-        margin-bottom: 1rem;
-      }
-
-      .gate-card h1 {
-        margin: 0;
-        font-family: var(--display);
-        font-size: 1.75rem;
-        font-weight: 400;
-        letter-spacing: -0.02em;
-      }
-
-      .gate-card .lead {
-        margin: 0.65rem 0 1.25rem;
-        color: var(--muted);
-        font-size: 0.9375rem;
-      }
-
-      .gate-card .member-note {
-        margin-top: 1.25rem;
-        padding-top: 1.25rem;
-        border-top: 1px solid var(--border);
-        font-size: 0.8125rem;
-        color: var(--muted);
-        text-align: left;
-        line-height: 1.5;
-      }
-
-      .gate-card .member-note strong {
-        color: var(--text);
-      }
-
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.4rem;
-        padding: 0.65rem 1.15rem;
-        font: inherit;
-        font-size: 0.875rem;
-        font-weight: 600;
-        text-decoration: none;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        cursor: pointer;
-        transition: transform 0.12s, box-shadow 0.12s, background 0.12s;
-      }
-
-      .btn:hover {
-        transform: translateY(-1px);
-        box-shadow: var(--shadow);
-      }
-
-      .btn--primary {
-        width: 100%;
-        color: #fff;
-        background: linear-gradient(135deg, var(--oke-blue), #0052cc);
-        border-color: transparent;
-      }
-
-      .btn--ghost {
-        background: transparent;
-        color: var(--muted);
-        border-color: transparent;
-        font-weight: 500;
-      }
-
-      .btn--sm {
-        padding: 0.45rem 0.85rem;
-        font-size: 0.8125rem;
-      }
-
-      .btn--tms {
-        color: #fff;
-        background: var(--oke-blue);
-        border-color: transparent;
-      }
-
-      .btn--portal {
-        color: #fff;
-        background: var(--portal);
-        border-color: transparent;
-      }
-
-      /* ── Mockup banner ── */
-      .mock-banner {
-        position: sticky;
-        top: 0;
-        z-index: 900;
-        padding: 0.45rem 1rem;
-        text-align: center;
-        font-size: 0.75rem;
-        color: #92400e;
-        background: #fffbeb;
-        border-bottom: 1px solid #fde68a;
-      }
-
-      /* ── Nav ── */
-      .topnav {
-        position: sticky;
-        top: 28px;
-        z-index: 800;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-        max-width: 1180px;
-        margin: 0 auto;
-        padding: 0.65rem 1.25rem;
-        background: rgba(255, 255, 255, 0.82);
-        backdrop-filter: blur(12px) saturate(160%);
-        border: 1px solid var(--border);
-        border-radius: 999px;
-        box-shadow: var(--shadow);
-      }
-
-      .brand {
-        display: flex;
-        align-items: center;
-        gap: 0.55rem;
-        font-weight: 700;
-        font-size: 0.9375rem;
-        letter-spacing: -0.02em;
-      }
-
-      .brand-mark {
-        width: 28px;
-        height: 28px;
-        border-radius: 8px;
-        background: linear-gradient(135deg, var(--oke-blue), var(--oke-navy));
-        color: #fff;
-        display: grid;
-        place-items: center;
-        font-size: 0.75rem;
-        font-weight: 700;
-      }
-
-      .nav-actions {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-      }
-
-      .leader-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.3rem;
-        padding: 0.25rem 0.65rem;
-        font-size: 0.6875rem;
-        font-weight: 700;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-        color: var(--oke-navy);
-        background: var(--tms-soft);
-        border-radius: 999px;
-      }
-
-      .env-pill {
-        display: inline-flex;
-        padding: 0.15rem;
-        background: #f1f5f9;
-        border-radius: 999px;
-        border: 1px solid var(--border);
-      }
-
-      .env-pill button {
-        border: none;
-        background: transparent;
-        font: inherit;
-        font-size: 0.75rem;
-        font-weight: 600;
-        padding: 0.3rem 0.65rem;
-        border-radius: 999px;
-        color: var(--muted);
-        cursor: pointer;
-      }
-
-      .env-pill button.is-active {
-        background: var(--surface);
-        color: var(--text);
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-      }
-
-      /* ── Hero ── */
-      .hero-wrap {
-        max-width: 1180px;
-        margin: 0 auto;
-        padding: 2.5rem 1.25rem 1rem;
-      }
-
-      .hero {
-        position: relative;
-        overflow: hidden;
-        padding: clamp(2.5rem, 6vw, 4rem) clamp(1.5rem, 4vw, 3rem);
-        border-radius: 24px;
-        background: linear-gradient(145deg, #ffffff 0%, #f8fbff 45%, #fff7f4 100%);
-        border: 1px solid var(--border);
-        box-shadow: var(--shadow);
-      }
-
-      .hero::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(600px 300px at 85% 15%, rgba(0, 109, 255, 0.08), transparent),
-          radial-gradient(500px 280px at 10% 90%, rgba(13, 150, 105, 0.07), transparent);
-        pointer-events: none;
-      }
-
-      .hero-inner {
-        position: relative;
-        max-width: 720px;
-      }
-
-      .hero-kicker {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        margin-bottom: 1rem;
-        font-size: 0.8125rem;
-        font-weight: 600;
-        color: var(--oke-blue);
-      }
-
-      .hero h1 {
-        margin: 0;
-        font-family: var(--display);
-        font-size: clamp(2.25rem, 5.5vw, 3.5rem);
-        font-weight: 400;
-        line-height: 1.08;
-        letter-spacing: -0.03em;
-      }
-
-      .hero h1 em {
-        font-style: italic;
-        color: var(--oke-blue);
-      }
-
-      .hero-desc {
-        margin: 1rem 0 0;
-        max-width: 36rem;
-        font-size: 1.0625rem;
-        color: var(--muted);
-      }
-
-      .hero-stats {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1.5rem 2.5rem;
-        margin-top: 2rem;
-        padding-top: 1.75rem;
-        border-top: 1px solid var(--border);
-      }
-
-      .hero-stat strong {
-        display: block;
-        font-size: 1.5rem;
-        font-weight: 700;
-        letter-spacing: -0.02em;
-      }
-
-      .hero-stat span {
-        font-size: 0.8125rem;
-        color: var(--muted);
-      }
-
-      /* ── Ecosystem pillars ── */
-      .main {
-        max-width: 1180px;
-        margin: 0 auto;
-        padding: 1.5rem 1.25rem 3rem;
-      }
-
-      .section-label {
-        margin: 0 0 0.35rem;
-        font-size: 0.6875rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--muted);
-      }
-
-      .section-title {
-        margin: 0 0 1.25rem;
-        font-size: 1.35rem;
-        font-weight: 700;
-        letter-spacing: -0.02em;
-      }
-
-      .pillars-block {
-        width: 100%;
-        max-width: 880px;
-        margin: 0 auto;
-      }
-
-      .pillars {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.25rem;
-      }
-
-      @media (max-width: 768px) {
-        .pillars {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      .pillar {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        min-height: 240px;
-        padding: 2rem 1.75rem 1.75rem;
-        border-radius: var(--radius);
-        border: 1px solid var(--border);
-        background: var(--surface);
-        box-shadow: var(--shadow);
-        overflow: hidden;
-        transition: transform 0.2s, box-shadow 0.2s;
-      }
-
-      .pillar:hover {
-        transform: translateY(-3px);
-        box-shadow: var(--shadow-lg);
-      }
-
-      .pillar--tms {
-        background: linear-gradient(160deg, #ffffff 0%, var(--tms-soft) 100%);
-      }
-
-      .pillar--portal {
-        background: linear-gradient(160deg, #ffffff 0%, var(--portal-soft) 100%);
-      }
-
-      .pillar-tag {
-        display: inline-flex;
-        align-self: flex-start;
-        padding: 0.25rem 0.6rem;
-        font-size: 0.6875rem;
-        font-weight: 700;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        border-radius: 6px;
-        margin-bottom: 0.85rem;
-      }
-
-      .pillar--tms .pillar-tag {
-        color: var(--oke-blue);
-        background: rgba(0, 109, 255, 0.1);
-      }
-
-      .pillar--portal .pillar-tag {
-        color: var(--portal);
-        background: rgba(13, 150, 105, 0.12);
-      }
-
-      .pillar h3 {
-        margin: 0;
-        font-size: 1.5rem;
-        font-weight: 700;
-        letter-spacing: -0.02em;
-      }
-
-      .pillar p {
-        margin: 0.5rem 0 0;
-        color: var(--muted);
-        font-size: 0.9375rem;
-        flex: 1;
-      }
-
-      .pillar-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.35rem;
-        margin: 1rem 0 1.25rem;
-      }
-
-      .chip {
-        font-size: 0.75rem;
-        padding: 0.2rem 0.55rem;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.7);
-        border: 1px solid var(--border);
-        color: var(--muted);
-      }
-
-      .pillar-actions {
-        display: flex;
-        margin-top: auto;
-      }
-
-      .pillar-actions .btn {
-        width: 100%;
-        justify-content: center;
-        padding: 0.85rem 1.25rem;
-        font-size: 0.9375rem;
-      }
-
-      .main-note {
-        width: 100%;
-        margin: 1.25rem 0 0;
-        padding: 1rem 1.25rem;
-        font-size: 0.8125rem;
-        color: var(--muted);
-        line-height: 1.55;
-        text-align: left;
-        border-radius: var(--radius);
-        background: #f8fafc;
-        border: 1px solid var(--border);
-        box-sizing: border-box;
-      }
-
-      .main-note code {
-        font-size: 0.75rem;
-        background: #f1f5f9;
-        padding: 0.1rem 0.35rem;
-        border-radius: 4px;
-      }
-
-      .pillar-deco {
-        position: absolute;
-        right: -20px;
-        bottom: -20px;
-        width: 140px;
-        height: 140px;
-        border-radius: 50%;
-        opacity: 0.35;
-        pointer-events: none;
-      }
-
-      .pillar--tms .pillar-deco {
-        background: radial-gradient(circle, var(--oke-blue), transparent 70%);
-      }
-
-      .pillar--portal .pillar-deco {
-        background: radial-gradient(circle, var(--portal), transparent 70%);
-      }
-
-      /* ── Bento zones ── */
-      .zones-intro {
-        margin-bottom: 1.5rem;
-        max-width: 40rem;
-        color: var(--muted);
-        font-size: 0.9375rem;
-      }
-
-      .bento {
-        display: grid;
-        grid-template-columns: repeat(12, 1fr);
-        gap: 0.85rem;
-      }
-
-      .zone {
-        grid-column: span 6;
-        padding: 1.25rem 1.35rem;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-      }
-
-      .zone--wide {
-        grid-column: span 12;
-      }
-
-      .zone--lab {
-        grid-column: span 4;
-      }
-
-      @media (max-width: 960px) {
-        .zone,
-        .zone--lab {
-          grid-column: span 12;
-        }
-      }
-
-      .zone-head {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 0.85rem;
-      }
-
-      .zone-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        flex-shrink: 0;
-      }
-
-      .zone-dot--tms {
-        background: var(--oke-blue);
-      }
-      .zone-dot--portal {
-        background: var(--portal);
-      }
-      .zone-dot--lab {
-        background: var(--lab);
-      }
-      .zone-dot--public {
-        background: var(--public);
-      }
-
-      .zone-head h3 {
-        margin: 0;
-        font-size: 0.9375rem;
-        font-weight: 700;
-      }
-
-      .zone-head span {
-        margin-left: auto;
-        font-size: 0.75rem;
-        color: var(--muted);
-      }
-
-      .app-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 0.55rem;
-      }
-
-      .app-card {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-        padding: 0.75rem 0.85rem;
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        background: #fafbfc;
-        transition: border-color 0.15s, background 0.15s;
-      }
-
-      .app-card:hover {
-        border-color: rgba(0, 109, 255, 0.25);
-        background: #fff;
-      }
-
-      .app-card.is-hidden {
-        display: none;
-      }
-
-      .app-card-top {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 0.35rem;
-      }
-
-      .app-card h4 {
-        margin: 0;
-        font-size: 0.8125rem;
-        font-weight: 600;
-      }
-
-      .app-card p {
-        margin: 0;
-        font-size: 0.75rem;
-        color: var(--muted);
-        line-height: 1.4;
-      }
-
-      .app-card-actions {
-        display: flex;
-        gap: 0.35rem;
-        margin-top: 0.35rem;
-      }
-
-      .app-card-actions .btn {
-        flex: 1;
-        padding: 0.35rem 0.5rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-      }
-
-      .star {
-        color: #d97706;
-        font-size: 0.6875rem;
-      }
-
-      .access-tag {
-        font-size: 0.625rem;
-        font-weight: 700;
-        padding: 0.1rem 0.35rem;
-        border-radius: 4px;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-      }
-
-      .access-tag--leader {
-        color: var(--oke-navy);
-        background: var(--tms-soft);
-      }
-
-      .access-tag--member {
-        color: #065f46;
-        background: #d1fae5;
-      }
-
-      .access-tag--public {
-        color: #475569;
-        background: #f1f5f9;
-      }
-
-      /* ── Search + member panel ── */
-      .toolbar {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-        margin-bottom: 1.5rem;
-        align-items: center;
-      }
-
-      .search {
-        flex: 1;
-        min-width: 220px;
-        padding: 0.65rem 1rem 0.65rem 2.5rem;
-        font: inherit;
-        font-size: 0.875rem;
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242 1.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E")
-          no-repeat 0.85rem center;
-        box-shadow: var(--shadow);
-      }
-
-      .member-panel {
-        margin-top: 2.5rem;
-        padding: 1.35rem 1.5rem;
-        border-radius: var(--radius);
-        border: 1px dashed #cbd5e1;
-        background: #f8fafc;
-      }
-
-      .member-panel h3 {
-        margin: 0 0 0.35rem;
-        font-size: 1rem;
-      }
-
-      .member-panel p {
-        margin: 0 0 1rem;
-        font-size: 0.875rem;
-        color: var(--muted);
-      }
-
-      .footer {
-        max-width: 1180px;
-        margin: 0 auto;
-        padding: 0 1.25rem 3rem;
-        font-size: 0.8125rem;
-        color: var(--muted);
-      }
-
-      .footer code {
-        font-size: 0.75rem;
-        background: #f1f5f9;
-        padding: 0.1rem 0.35rem;
-        border-radius: 4px;
-      }
-
-      @media (max-width: 640px) {
-        .topnav {
-          border-radius: 16px;
-          flex-wrap: wrap;
-          justify-content: center;
-        }
-      }
-
-      /* ── In-mock app shells (TMS / Portal) ── */
-      .launcher-view {
-        display: none;
-      }
-
-      .launcher-view.is-active {
-        display: block;
-      }
-
-      body.launcher-app-mode {
-        overflow: hidden;
-        background: #eef2f7;
-      }
-
-      body.launcher-app-mode .app-shell {
-        min-height: 100vh;
-        height: 100vh;
-      }
-
-      body.launcher-app-mode .app-sidebar {
-        min-height: 100%;
-        height: 100%;
-      }
-
-      body.launcher-app-mode .app-main {
-        min-height: 0;
-        height: 100%;
-        overflow: auto;
-      }
-
-      .app-shell {
-        display: grid;
-        grid-template-columns: 15rem 1fr;
-        min-height: 100vh;
-        background: #eef2f7;
-      }
-
-      .app-sidebar {
-        display: flex;
-        flex-direction: column;
-        padding: 1rem 0.65rem;
-        border-right: 1px solid var(--border);
-        min-height: 100%;
-      }
-
-      .app-sidebar--tms {
-        background: #f8fafc;
-        color: var(--text);
-      }
-
-      .app-sidebar--portal {
-        background: #0f1324;
-        color: #eef2ff;
-        border-right: none;
-      }
-
-      .app-sidebar__head h2 {
-        margin: 0;
-        font-size: 1.05rem;
-        font-weight: 700;
-      }
-
-      .app-sidebar__head p {
-        margin: 0.35rem 0 0.85rem;
-        font-size: 0.75rem;
-        opacity: 0.75;
-      }
-
-      .app-sidebar__nav {
-        display: flex;
-        flex-direction: column;
-        gap: 0.3rem;
-        flex: 1;
-      }
-
-      .app-nav-item {
-        display: flex;
-        align-items: center;
-        gap: 0.45rem;
-        padding: 0.5rem 0.65rem;
-        font: inherit;
-        font-size: 0.8125rem;
-        font-weight: 500;
-        text-align: left;
-        border: 1px solid transparent;
-        border-radius: 10px;
-        background: transparent;
-        cursor: pointer;
-        color: inherit;
-      }
-
-      .app-sidebar--tms .app-nav-item.is-active {
-        background: rgba(0, 109, 255, 0.1);
-        border-color: rgba(0, 109, 255, 0.25);
-        color: var(--oke-blue);
-        font-weight: 600;
-      }
-
-      .app-sidebar--portal .app-nav-item.is-active {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(255, 255, 255, 0.12);
-      }
-
-      .app-sidebar__bottom {
-        margin-top: auto;
-        padding-top: 0.65rem;
-        border-top: 1px solid var(--border);
-      }
-
-      .app-sidebar--portal .app-sidebar__bottom {
-        border-top-color: rgba(255, 255, 255, 0.1);
-      }
-
-      .app-nav-item--workspace {
-        text-decoration: none;
-        color: #059669;
-        border-color: rgba(16, 185, 129, 0.25);
-        background: rgba(16, 185, 129, 0.06);
-        font-weight: 600;
-      }
-
-      .app-sidebar--portal .app-nav-item--workspace {
-        color: #6ee7b7;
-        background: rgba(16, 185, 129, 0.12);
-        border-color: rgba(16, 185, 129, 0.3);
-      }
-
-      .app-nav-item--workspace:hover {
-        background: rgba(16, 185, 129, 0.12);
-      }
-
-      .app-main {
-        display: flex;
-        flex-direction: column;
-        min-width: 0;
-      }
-
-      .app-toolbar {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.65rem 1rem;
-        background: var(--surface);
-        border-bottom: 1px solid var(--border);
-      }
-
-      .btn--workspace {
-        color: #047857;
-        background: #ecfdf5;
-        border-color: rgba(16, 185, 129, 0.35);
-        font-weight: 600;
-      }
-
-      .btn--workspace:hover {
-        background: #d1fae5;
-      }
-
-      .app-toolbar__title {
-        margin: 0 0 0 auto;
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--muted);
-      }
-
-      .app-content {
-        flex: 1;
-        padding: 1.25rem 1.5rem 2rem;
-        overflow: auto;
-      }
-
-      body.launcher-app-mode .app-content {
-        background: #f3f5fb;
-      }
-
-      body.launcher-app-mode.launcher-app-portal .app-content {
-        background: #f3f5fb;
-      }
-
-      .app-content h2 {
-        margin: 0 0 0.35rem;
-        font-size: 1.35rem;
-      }
-
-      .app-content .lead {
-        margin: 0 0 1rem;
-        color: var(--muted);
-        font-size: 0.9375rem;
-      }
-
-      .app-mock-card {
-        padding: 1rem 1.15rem;
-        border-radius: 12px;
-        border: 1px dashed #cbd5e1;
-        background: #fff;
-        font-size: 0.875rem;
-        color: var(--muted);
-        line-height: 1.55;
-      }
-
-      .app-mock-card strong {
-        color: var(--text);
-      }
-
-      .app-content__head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.75rem;
-        margin-bottom: 0.5rem;
-      }
-
-      .app-content__head h2 {
-        margin: 0;
-      }
-
-      .app-content__meta {
-        font-size: 0.8125rem;
-        color: var(--muted);
-      }
-
-      .app-desc {
-        margin: 0 0 1rem;
-        color: var(--muted);
-        font-size: 0.9375rem;
-      }
-
-      .app-module-cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 0.75rem;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-      }
-
-      .app-module-card {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-        padding: 1rem 1.1rem;
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        background: #fff;
-        box-shadow: var(--shadow);
-      }
-
-      .app-module-card strong {
-        font-size: 0.9375rem;
-      }
-
-      .app-module-card span {
-        font-size: 0.8125rem;
-        color: var(--muted);
-      }
-
-      body:not(.launcher-unlocked) .launcher-view:not(#view-landing) {
-        display: none !important;
-      }
-
-      @media (max-width: 768px) {
-        .app-shell {
-          grid-template-columns: 1fr;
-          grid-template-rows: auto 1fr;
-          height: auto;
-          min-height: 100vh;
-        }
-
-        body.launcher-app-mode .app-shell {
-          height: 100vh;
-        }
-
-        .app-sidebar {
-          border-right: none;
-          border-bottom: 1px solid var(--border);
-          min-height: auto;
-          height: auto;
-        }
-
-        .app-sidebar__nav {
-          flex-direction: row;
-          flex-wrap: wrap;
-        }
-
-        .app-sidebar__bottom {
-          margin-top: 0;
-          padding-top: 0.45rem;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Mock leader gate -->
-    <div class="gate" id="gate" role="dialog" aria-labelledby="gate-title" aria-modal="true">
-      <div class="gate-card">
-        <span class="gate-badge">🔒 팀장 전용</span>
-        <h1 id="gate-title">cxr542 Workspace</h1>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cxr542 Workspace — 디자인 시안</title>
+  <style>
+    :root {
+      --bg: #070b18;
+      --panel: rgba(255, 255, 255, 0.08);
+      --panel-strong: rgba(255, 255, 255, 0.12);
+      --line: rgba(255, 255, 255, 0.14);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --soft: #cbd5e1;
+      --blue: #38bdf8;
+      --violet: #818cf8;
+      --green: #34d399;
+      --shadow: 0 30px 90px rgba(0, 0, 0, 0.42);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(99, 102, 241, 0.32), transparent 34%),
+        radial-gradient(circle at 82% 14%, rgba(56, 189, 248, 0.24), transparent 28%),
+        radial-gradient(circle at 72% 92%, rgba(52, 211, 153, 0.16), transparent 30%),
+        var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 54px 54px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.75), transparent 85%);
+      pointer-events: none;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 44px));
+      margin: 0 auto;
+      padding: 36px 0 42px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 74px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--violet), var(--blue));
+      box-shadow: 0 18px 50px rgba(56, 189, 248, 0.22);
+      font-weight: 900;
+      letter-spacing: -0.08em;
+    }
+
+    .brand-title {
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      font-size: 17px;
+    }
+
+    .brand-subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--soft);
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-size: 13px;
+      backdrop-filter: blur(14px);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+      gap: 36px;
+      align-items: end;
+    }
+
+    .eyebrow {
+      color: var(--blue);
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(48px, 7vw, 84px);
+      line-height: 0.94;
+      letter-spacing: -0.085em;
+    }
+
+    .lead {
+      max-width: 650px;
+      color: var(--soft);
+      line-height: 1.75;
+      font-size: 18px;
+      margin: 26px 0 0;
+      word-break: keep-all;
+    }
+
+    .status-board {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+      backdrop-filter: blur(20px);
+    }
+
+    .status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .status-header strong {
+      letter-spacing: -0.035em;
+      font-size: 18px;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 20px rgba(52, 211, 153, 0.9);
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    .stat-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .stat {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 15px 16px;
+      border-radius: 18px;
+      background: rgba(3, 7, 18, 0.35);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--soft);
+      font-size: 14px;
+    }
+
+    .stat b {
+      color: var(--text);
+      font-size: 15px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+      margin-top: 48px;
+    }
+
+    .card {
+      min-height: 276px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-decoration: none;
+      color: inherit;
+      padding: 30px;
+      border-radius: 34px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      width: 230px;
+      height: 230px;
+      border-radius: 999px;
+      right: -90px;
+      top: -88px;
+      background: rgba(56, 189, 248, 0.18);
+      filter: blur(4px);
+    }
+
+    .card.portal::after {
+      background: rgba(129, 140, 248, 0.22);
+    }
+
+    .card:hover {
+      transform: translateY(-7px);
+      background: var(--panel-strong);
+      border-color: rgba(125, 211, 252, 0.5);
+    }
+
+    .card-top, .card-bottom { position: relative; z-index: 1; }
+
+    .card-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #bfdbfe;
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 18px;
+    }
+
+    .icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.14);
+      margin-bottom: 18px;
+      font-size: 20px;
+    }
+
+    .card h2 {
+      font-size: 34px;
+      margin: 0 0 14px;
+      letter-spacing: -0.06em;
+    }
+
+    .card p {
+      color: var(--soft);
+      line-height: 1.65;
+      margin: 0;
+      max-width: 440px;
+      word-break: keep-all;
+    }
+
+    .card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-top: 34px;
+    }
+
+    .open {
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .mini-url {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer {
+      margin-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 860px) {
+      .shell { width: min(100% - 32px, 680px); padding-top: 24px; }
+      .topbar { align-items: flex-start; margin-bottom: 52px; }
+      .top-actions { display: none; }
+      .hero-grid { grid-template-columns: 1fr; }
+      .cards { grid-template-columns: 1fr; margin-top: 28px; }
+      .footer { flex-direction: column; }
+      .status-board { order: -1; }
+    }
+
+    @media (max-width: 520px) {
+      .card { padding: 24px; border-radius: 26px; }
+      .card h2 { font-size: 29px; }
+      .lead { font-size: 16px; }
+      h1 { font-size: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">C</div>
+        <div>
+          <div class="brand-title">cxr542 Workspace</div>
+          <div class="brand-subtitle">OKESTRO 교육팀 · 팀장용 런처</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span class="pill">팀장 전용</span>
+        <span class="pill">Vercel 운영</span>
+        <span class="pill">Launcher v2 Preview</span>
+      </div>
+    </header>
+
+    <section class="hero-grid">
+      <div>
+        <div class="eyebrow">Digital Workspace</div>
+        <h1>업무 화면을<br />한 번에 연결.</h1>
         <p class="lead">
-          이 런처는 <strong>교육팀 팀장</strong>만 접속할 수 있습니다.<br />
-          아래 두 서비스 중 하나를 선택하세요.
-        </p>
-        <button type="button" class="btn btn--primary" id="gate-enter">팀장으로 계속 (목업)</button>
-        <p class="member-note">
-          <strong>팀원이신가요?</strong> 이 페이지 대신 TMS 북마크 URL을 사용하세요.
-          장부 조회 · 본인 일지(B/C) · 점심 · 이것도? 등은
-          <a href="#" id="gate-tms-public">TMS 운영 URL</a>에서 바로 열 수 있습니다.
-          (런처 배포 시 팀원 접근은 403 또는 TMS 안내 페이지로 리다이렉트 예정)
+          교육팀 TMS와 cxr542-portal을 한 곳에서 빠르게 여는 팀장용 랜딩 페이지입니다.
+          설명은 줄이고, 실제 운영 런처처럼 바로 이동할 수 있는 구조로 정리했습니다.
         </p>
       </div>
-    </div>
 
-    <div id="view-landing" class="launcher-view is-active">
-    <p class="mock-banner" id="launcher-status-banner">
-      <strong>cxr542 Workspace</strong> · TMS · Portal · <strong>← Workspace</strong>로 복귀
-    </p>
-
-    <div class="hero-wrap">
-      <nav class="topnav" aria-label="워크스페이스">
-        <div class="brand">
-          <span class="brand-mark" aria-hidden="true">C</span>
-          cxr542 Workspace
+      <aside class="status-board" aria-label="운영 상태 요약">
+        <div class="status-header">
+          <strong>Workspace Status</strong>
+          <span class="pill"><span class="dot"></span>Online</span>
         </div>
-        <div class="nav-actions">
-          <span class="leader-pill">팀장 · 김윤형</span>
-          <div class="env-pill" role="group" aria-label="환경">
-            <button type="button" class="is-active" data-env="prod">운영</button>
-            <button type="button" data-env="local">로컬</button>
-          </div>
-          <button type="button" class="btn btn--ghost btn--sm" id="logout-mock">잠금</button>
+        <div class="stat-list">
+          <div class="stat"><span>운영 URL</span><b>cxr542-launcher</b></div>
+          <div class="stat"><span>주요 목적</span><b>TMS / Portal 진입</b></div>
+          <div class="stat"><span>권장 사용</span><b>팀장 북마크</b></div>
         </div>
-      </nav>
+      </aside>
+    </section>
 
-      <header class="hero">
-        <div class="hero-inner">
-          <p class="hero-kicker">OKESTRO 교육팀 · 디지털 워크스페이스</p>
-          <h1>어디로<br /><em>이동할까요?</em></h1>
-          <p class="hero-desc">
-            <strong>교육팀 TMS</strong>(회사·업무)와 <strong>cxr542-portal</strong>(개인·집 PC) — 두 곳만 연결합니다.
-          </p>
+    <section class="cards" aria-label="앱 바로가기">
+      <a class="card tms" href="#">
+        <div class="card-top">
+          <div class="icon">📊</div>
+          <div class="card-label">COMPANY WORK</div>
+          <h2>교육팀 TMS</h2>
+          <p>장부, 일일 업무일지, KPI, 점심, Academizer, 참고문서 등 교육팀 운영 업무 화면으로 이동합니다.</p>
         </div>
-      </header>
-    </div>
+        <div class="card-bottom">
+          <span class="open">TMS 열기 →</span>
+          <span class="mini-url">team management</span>
+        </div>
+      </a>
 
-    <main class="main">
-      <div class="pillars">
-        <article class="pillar pillar--tms">
-          <span class="pillar-tag">회사 · 업무</span>
-          <h3>교육팀 TMS</h3>
-          <p>장부 · 일지 · KPI · 점심 · Academizer · 참고문서</p>
-          <div class="pillar-actions">
-            <button type="button" class="btn btn--tms" id="pillar-tms" data-go="tms">TMS 열기 →</button>
-          </div>
-          <div class="pillar-deco" aria-hidden="true"></div>
-        </article>
-        <article class="pillar pillar--portal">
-          <span class="pillar-tag">개인 · 집 PC</span>
-          <h3>cxr542-portal</h3>
-          <p>vision-font · today-shoes · 마라톤 · 아이디어 뱅크</p>
-          <div class="pillar-actions">
-            <button type="button" class="btn btn--portal" id="pillar-portal" data-go="portal">Portal 열기 →</button>
-          </div>
-          <div class="pillar-deco" aria-hidden="true"></div>
-        </article>
-      </div>
-
-      <p class="main-note">
-        TMS·Portal 안에서는 <strong>← Workspace</strong>로 이 랜딩으로 돌아옵니다. (기존 cxr542 허브 메뉴 대체)
-        팀원(B·C)은 이 런처 대신 TMS 북마크를 사용합니다.
-        공개 장부 조회는 <a href="#" id="foot-tms-public">TMS 운영 URL</a>.
-      </p>
-    </main>
+      <a class="card portal" href="#">
+        <div class="card-top">
+          <div class="icon">🧩</div>
+          <div class="card-label">PERSONAL PORTAL</div>
+          <h2>cxr542-portal</h2>
+          <p>vision-font, today-shoes, 마라톤, 아이디어 뱅크 등 개인 모듈과 개발 포털로 이동합니다.</p>
+        </div>
+        <div class="card-bottom">
+          <span class="open">Portal 열기 →</span>
+          <span class="mini-url">home workspace</span>
+        </div>
+      </a>
+    </section>
 
     <footer class="footer">
-      <code>github.com/cxr542/cxr542-launcher</code> ·
-      <code>cxr542-launcher.vercel.app</code>
+      <span>팀원은 이 런처 대신 TMS 북마크 URL을 사용하도록 안내하는 구조입니다.</span>
+      <span>github.com/cxr542/cxr542-launcher · preview design</span>
     </footer>
-    </div>
-
-    <!-- TMS in-mock -->
-    <div id="view-tms" class="launcher-view" aria-hidden="true">
-      <div class="app-shell">
-        <aside class="app-sidebar app-sidebar--tms" aria-label="TMS 메뉴">
-          <div class="app-sidebar__head">
-            <h2>교육팀 TMS</h2>
-            <p>회사 · 업무 · v1.0</p>
-          </div>
-          <nav class="app-sidebar__nav" aria-label="주 메뉴">
-            <button type="button" class="app-nav-item is-active">📒 장부</button>
-            <button type="button" class="app-nav-item">📅 일일 업무일지</button>
-            <button type="button" class="app-nav-item">📊 KPI</button>
-            <button type="button" class="app-nav-item">🍽 점심</button>
-          </nav>
-          <div class="app-sidebar__bottom">
-            <a class="app-nav-item app-nav-item--workspace" href="#landing" data-go="landing">← Workspace</a>
-          </div>
-        </aside>
-        <div class="app-main">
-          <div class="app-toolbar">
-            <a class="btn btn--workspace btn--sm" href="#landing" data-go="landing">← Workspace</a>
-            <a class="btn btn--sm" id="tms-open-real" href="#" target="_blank" rel="noopener">실제 TMS 열기 ↗</a>
-          </div>
-          <div class="app-content">
-            <header class="app-content__head">
-              <h2>교육팀 TMS (목업)</h2>
-              <span class="app-content__meta">장부 · 운영</span>
-            </header>
-            <p class="app-desc">사이드바·툴바의 <strong>← Workspace</strong>가 랜딩으로 돌아갑니다. 허브 메뉴는 쓰지 않습니다.</p>
-            <div class="app-mock-card">
-              실제 앱에서는 <strong>AppShell</strong> 사이드바 하단·툴바에 동일한 Workspace 링크가 노출됩니다.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Portal in-mock -->
-    <div id="view-portal" class="launcher-view" aria-hidden="true">
-      <div class="app-shell">
-        <aside class="app-sidebar app-sidebar--portal" aria-label="Portal 메뉴">
-          <div class="app-sidebar__head">
-            <h2>cxr542</h2>
-            <p>개인 개발 포털</p>
-          </div>
-          <nav class="app-sidebar__nav" aria-label="주 메뉴">
-            <button type="button" class="app-nav-item is-active">🏠 포털 홈</button>
-            <button type="button" class="app-nav-item">🔤 vision-font</button>
-            <button type="button" class="app-nav-item">👟 today-shoes</button>
-            <button type="button" class="app-nav-item">💡 아이디어 뱅크</button>
-          </nav>
-          <div class="app-sidebar__bottom">
-            <a class="app-nav-item app-nav-item--workspace" href="#landing" data-go="landing">← Workspace</a>
-          </div>
-        </aside>
-        <div class="app-main">
-          <div class="app-toolbar">
-            <a class="btn btn--workspace btn--sm" href="#landing" data-go="landing">← Workspace</a>
-            <a class="btn btn--sm" id="portal-open-real" href="#" target="_blank" rel="noopener">실제 Portal 열기 ↗</a>
-          </div>
-          <div class="app-content">
-            <header class="app-content__head">
-              <h2>cxr542-portal (목업)</h2>
-              <span class="app-content__meta">v0.1.0 MVP</span>
-            </header>
-            <p class="app-desc">모듈 화면에서도 사이드바·툴바의 <strong>← Workspace</strong>로 랜딩에 복귀합니다.</p>
-            <ul class="app-module-cards">
-              <li class="app-module-card">
-                <strong>🔤 vision-font</strong>
-                <span>폰트 프리셋 미리보기·CSS 복사</span>
-              </li>
-              <li class="app-module-card">
-                <strong>👟 today-shoes</strong>
-                <span>신발 착화 기록·태그</span>
-              </li>
-              <li class="app-module-card">
-                <strong>💡 아이디어 뱅크</strong>
-                <span>아이디어 노트·JSON 백업</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <script>
-      const ORIGINS = {
-        prod: {
-          tms: "https://okestro-edu-team-tms.vercel.app",
-          portal: "https://cxr542-portal.vercel.app",
-        },
-        local: {
-          tms: "http://localhost:3003",
-          portal: "http://localhost:5173",
-        },
-      };
-
-      function isDeployedLauncher() {
-        const h = location.hostname;
-        return (
-          h === "cxr542-launcher.vercel.app" ||
-          (h.endsWith(".vercel.app") && h.startsWith("cxr542-launcher"))
-        );
-      }
-
-      function openPillarApp(which) {
-        const o = ORIGINS[env];
-        if (which === "tms") {
-          window.location.href = `${o.tms}/?mode=edit&access=leader`;
-          return;
-        }
-        if (which === "portal") {
-          window.location.href = `${o.portal}/`;
-        }
-      }
-
-      const VIEWS = {
-        landing: document.getElementById("view-landing"),
-        tms: document.getElementById("view-tms"),
-        portal: document.getElementById("view-portal"),
-      };
-
-      let env = "prod";
-      let currentView = "landing";
-
-      function applyOrigins() {
-        const o = ORIGINS[env];
-        document.getElementById("tms-open-real").href = `${o.tms}/?mode=edit&access=leader`;
-        document.getElementById("portal-open-real").href = o.portal + "/";
-        document.getElementById("gate-tms-public").href = `${o.tms}/?mode=view`;
-        const foot = document.getElementById("foot-tms-public");
-        if (foot) foot.href = `${o.tms}/?mode=view`;
-      }
-
-      function setUnlocked(unlocked) {
-        document.body.classList.toggle("launcher-unlocked", unlocked);
-        document.getElementById("gate").classList.toggle("is-hidden", unlocked);
-        if (unlocked) {
-          sessionStorage.setItem("cxr542-launcher-mock-unlocked", "1");
-        } else {
-          sessionStorage.removeItem("cxr542-launcher-mock-unlocked");
-        }
-      }
-
-      function showView(name) {
-        currentView = name;
-        const isApp = name === "tms" || name === "portal";
-        document.body.classList.toggle("launcher-app-mode", isApp);
-        document.body.classList.toggle("launcher-app-tms", name === "tms");
-        document.body.classList.toggle("launcher-app-portal", name === "portal");
-
-        Object.entries(VIEWS).forEach(([key, el]) => {
-          if (!el) return;
-          const active = key === name;
-          el.classList.toggle("is-active", active);
-          el.setAttribute("aria-hidden", active ? "false" : "true");
-        });
-
-        const hash = name === "landing" ? "#landing" : `#${name}`;
-        if (location.hash !== hash) {
-          history.replaceState(null, "", hash);
-        }
-        window.scrollTo({ top: 0, behavior: "auto" });
-      }
-
-      function readViewFromHash() {
-        const h = location.hash.replace(/^#/, "");
-        if (h === "tms" || h === "portal") return h;
-        return "landing";
-      }
-
-      document.getElementById("gate-enter").addEventListener("click", () => {
-        setUnlocked(true);
-        showView(readViewFromHash());
-      });
-
-      document.getElementById("logout-mock").addEventListener("click", () => {
-        setUnlocked(false);
-        showView("landing");
-      });
-
-      if (sessionStorage.getItem("cxr542-launcher-mock-unlocked") === "1") {
-        setUnlocked(true);
-      }
-
-      document.querySelectorAll(".env-pill button").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          document.querySelectorAll(".env-pill button").forEach((b) => b.classList.remove("is-active"));
-          btn.classList.add("is-active");
-          env = btn.dataset.env;
-          applyOrigins();
-        });
-      });
-
-      document.querySelectorAll("[data-go]").forEach((el) => {
-        el.addEventListener("click", (e) => {
-          const target = el.dataset.go;
-          if (isDeployedLauncher() && (target === "tms" || target === "portal")) {
-            e.preventDefault();
-            openPillarApp(target);
-            return;
-          }
-          if (target === "landing" || target === "tms" || target === "portal") {
-            e.preventDefault();
-            showView(target);
-          }
-        });
-      });
-
-      if (isDeployedLauncher()) {
-        env = "prod";
-        document.querySelectorAll(".env-pill button").forEach((b) => {
-          b.classList.toggle("is-active", b.dataset.env === "prod");
-          b.disabled = b.dataset.env === "local";
-        });
-      }
-
-      window.addEventListener("hashchange", () => {
-        if (!document.body.classList.contains("launcher-unlocked")) {
-          showView("landing");
-          return;
-        }
-        showView(readViewFromHash());
-      });
-
-      applyOrigins();
-      if (sessionStorage.getItem("cxr542-launcher-mock-unlocked") === "1") {
-        showView(readViewFromHash());
-      } else {
-        showView("landing");
-      }
-    </script>
-  </body>
+  </main>
+</body>
 </html>
