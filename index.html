@@ -3,6 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#070b18" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="AI학습허브" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="description" content="교육팀 TMS와 cxr542-portal로 빠르게 이동하는 팀장용 Workspace 런처" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
   <title>cxr542 Workspace — 팀장 런처</title>
   <style>
     :root {
@@ -242,6 +249,11 @@
       border-color: rgba(125, 211, 252, 0.5);
     }
 
+    .card:focus-visible {
+      outline: 3px solid rgba(56, 189, 248, 0.9);
+      outline-offset: 4px;
+    }
+
     .card-top, .card-bottom { position: relative; z-index: 1; }
 
     .card-label {
@@ -356,7 +368,7 @@
       <aside class="status-board" aria-label="운영 상태 요약">
         <div class="status-header">
           <strong>Workspace Status</strong>
-          <span class="pill"><span class="dot"></span>Online</span>
+          <span class="pill"><span class="dot"></span>Launcher Ready</span>
         </div>
         <div class="stat-list">
           <div class="stat"><span>운영 URL</span><b>cxr542-launcher</b></div>
