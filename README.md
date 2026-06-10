@@ -1,11 +1,30 @@
 # cxr542-launcher
 
-팀장용 **Workspace 랜딩** — [교육팀 TMS](https://github.com/cxr542/edu-team-tms) · [cxr542-portal](https://github.com/cxr542/cxr542-portal) 두 앱으로만 연결합니다.
+팀장용 **Workspace 랜딩** — [교육팀 TMS](https://github.com/cxr542/edu-team-tms) · [cxr542-portal](https://github.com/cxr542/cxr542-portal) 두 앱으로 빠르게 진입하기 위한 운영 런처입니다.
 
 | 환경 | URL |
 |------|-----|
 | 운영 | https://cxr542-launcher.vercel.app |
 | 로컬 | http://localhost:4321 |
+
+## 목적
+
+`cxr542-launcher`는 교육팀 업무 화면과 개인 개발 포털을 한 곳에서 여는 개인/팀장용 허브입니다.  
+브라우저 북마크나 iPhone 홈 화면에 추가해두고, 매번 TMS와 Portal 주소를 따로 찾지 않도록 하는 것이 목적입니다.
+
+## 연결 서비스
+
+| 서비스 | URL | 역할 |
+|------|-----|------|
+| 교육팀 TMS | https://okestro-edu-team-tms.vercel.app/ | 장부, 일일 업무일지, KPI, 점심, Academizer, 참고문서 등 교육팀 운영 업무 |
+| cxr542-portal | https://cxr542-portal.vercel.app/ | 아이디어뱅크, vision-font, today-shoes, 마라톤 등 개인 모듈과 개발 포털 |
+
+## iPhone 홈 화면 추가
+
+1. iPhone에서 Safari로 https://cxr542-launcher.vercel.app 접속
+2. 하단 공유 버튼 선택
+3. **홈 화면에 추가** 선택
+4. 이름을 `AI학습허브` 또는 `cxr542 런처`로 저장
 
 ## 개발
 
