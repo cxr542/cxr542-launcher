@@ -1,0 +1,147 @@
+{
+  "name": "GitHub Actions failure to Vercel deployment classifier",
+  "nodes": [
+    {
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [260, 220],
+      "parameters": {}
+    },
+    {
+      "id": "input",
+      "name": "Input Context",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [500, 220],
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            { "name": "repo", "value": "cxr542/cxr542-launcher" },
+            { "name": "branch", "value": "main" },
+            { "name": "failedWorkflowName", "value": "Deploy Production" },
+            { "name": "commitSha", "value": "cd539be" },
+            { "name": "vercelProject", "value": "cxr542-launcher" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "vercel-deployments",
+      "name": "Get Latest Vercel Production Deployment",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [760, 220],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.vercel.com/v6/deployments?projectId={{$env.VERCEL_PROJECT_ID_CXR542_LAUNCHER}}&target=production&limit=1",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "responseFormat": "json"
+          }
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env.VERCEL_TOKEN}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "classify",
+      "name": "Classify Result",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [1020, 220],
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            { "name": "classification", "value": "workflow-only-failure" },
+            { "name": "summary", "value": "GitHub Actions failed, but Vercel production is READY on the latest commit." }
+          ]
+        }
+      }
+    },
+    {
+      "id": "notify",
+      "name": "Notification Draft",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [1280, 220],
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "notification",
+              "value": "[POC] {{$json.classification}} — {{$json.summary}}"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Input Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input Context": {
+      "main": [
+        [
+          {
+            "node": "Get Latest Vercel Production Deployment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Latest Vercel Production Deployment": {
+      "main": [
+        [
+          {
+            "node": "Classify Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Result": {
+      "main": [
+        [
+          {
+            "node": "Notification Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "versionId": "poc-1"
+}

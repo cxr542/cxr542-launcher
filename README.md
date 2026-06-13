@@ -65,6 +65,12 @@
 - 상태: 준비 중
 - 역할: 배포, 운영, 장애 대응 절차 문서
 
+### n8n PoC
+
+- 상태: 초안
+- 역할: GitHub Actions 실패와 Vercel 배포 상태를 분류하는 read-only 자동화 실험
+- 문서: `docs/n8n/github-actions-vercel-deploy-classifier.md`
+
 ## Operating Rules
 
 - 운영 데이터 쓰기는 명시 승인 후 수행합니다.
