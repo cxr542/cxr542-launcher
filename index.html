@@ -209,6 +209,40 @@
       margin-top: 48px;
     }
 
+    .section {
+      margin-top: 44px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .section-kicker {
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .section h2 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: -0.05em;
+    }
+
+    .section p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
     .card {
       min-height: 276px;
       position: relative;
@@ -225,6 +259,12 @@
       box-shadow: var(--shadow);
       backdrop-filter: blur(22px);
       transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+
+    .card.card-disabled {
+      cursor: default;
+      background: rgba(255, 255, 255, 0.045);
+      border-style: dashed;
     }
 
     .card::after {
@@ -247,6 +287,12 @@
       transform: translateY(-7px);
       background: var(--panel-strong);
       border-color: rgba(125, 211, 252, 0.5);
+    }
+
+    .card.card-disabled:hover {
+      transform: none;
+      background: rgba(255, 255, 255, 0.045);
+      border-color: var(--line);
     }
 
     .card:focus-visible {
@@ -310,6 +356,21 @@
       font-size: 13px;
     }
 
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--soft);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: rgba(255,255,255,0.05);
+      width: fit-content;
+    }
+
     .footer {
       margin-top: 24px;
       display: flex;
@@ -328,6 +389,7 @@
       .cards { grid-template-columns: 1fr; margin-top: 28px; }
       .footer { flex-direction: column; }
       .status-board { order: -1; }
+      .section-head { flex-direction: column; align-items: flex-start; }
     }
 
     @media (max-width: 520px) {
@@ -378,7 +440,17 @@
       </aside>
     </section>
 
-    <section class="cards" aria-label="앱 바로가기">
+    <section class="section" aria-label="활성 앱">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Active Apps</div>
+          <h2>운영 중인 앱</h2>
+          <p>실제 URL이 있는 항목만 활성 링크로 유지합니다. EDU-TMS와 cxr542-portal은 바로 진입 가능합니다.</p>
+        </div>
+        <span class="pill">Live</span>
+      </div>
+
+      <div class="cards">
       <a class="card tms" href="https://okestro-edu-team-tms.vercel.app/?mode=edit&access=leader" target="_blank" rel="noopener noreferrer">
         <div class="card-top">
           <div class="icon">📊</div>
@@ -404,6 +476,85 @@
           <span class="mini-url">cxr542-portal</span>
         </div>
       </a>
+      </div>
+    </section>
+
+    <section class="section" aria-label="예정 앱">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Planned Apps</div>
+          <h2>준비 중인 앱</h2>
+          <p>아직 실제 URL을 만들지 않은 항목은 비활성 카드로만 표시합니다.</p>
+        </div>
+        <span class="status-chip">준비 중</span>
+      </div>
+
+      <div class="cards">
+        <div class="card card-disabled" aria-disabled="true">
+          <div class="card-top">
+            <div class="icon">⏳</div>
+            <div class="card-label">PLANNED APP</div>
+            <h2>cxr542-ai-pulse</h2>
+            <p>상태, 알림, 운영 신호, 체크리스트 허브를 위한 예정 영역입니다.</p>
+          </div>
+          <div class="card-bottom">
+            <span class="open">준비 중</span>
+            <span class="mini-url">no live URL</span>
+          </div>
+        </div>
+
+        <div class="card card-disabled" aria-disabled="true">
+          <div class="card-top">
+            <div class="icon">🗂️</div>
+            <div class="card-label">PLANNED APP</div>
+            <h2>cxr542-ai-ideabank</h2>
+            <p>아이디어, 프롬프트, 실험 후보를 모아두는 예정 저장소입니다.</p>
+          </div>
+          <div class="card-bottom">
+            <span class="open">준비 중</span>
+            <span class="mini-url">no live URL</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-label="workspace assets">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Workspace Assets</div>
+          <h2>문서 자산</h2>
+          <p>프롬프트와 런북은 기능이 아니라 문서 구조로 정리합니다.</p>
+        </div>
+        <span class="status-chip">문서</span>
+      </div>
+
+      <div class="cards">
+        <div class="card card-disabled" aria-disabled="true">
+          <div class="card-top">
+            <div class="icon">✍️</div>
+            <div class="card-label">PROMPTS</div>
+            <h2>prompts</h2>
+            <p>Codex/Cursor 작업 프롬프트 라이브러리입니다. 템플릿과 운영 가이드를 보관합니다.</p>
+          </div>
+          <div class="card-bottom">
+            <span class="open">문서 정리 예정</span>
+            <span class="mini-url">no live URL</span>
+          </div>
+        </div>
+
+        <div class="card card-disabled" aria-disabled="true">
+          <div class="card-top">
+            <div class="icon">📘</div>
+            <div class="card-label">RUNBOOKS</div>
+            <h2>runbooks</h2>
+            <p>배포, 운영, 장애 대응 절차 문서를 모아두는 영역입니다. 실행 기능은 없습니다.</p>
+          </div>
+          <div class="card-bottom">
+            <span class="open">문서 정리 예정</span>
+            <span class="mini-url">no live URL</span>
+          </div>
+        </div>
+      </div>
     </section>
 
     <footer class="footer">
