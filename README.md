@@ -5,7 +5,7 @@
 
 | 환경 | URL |
 |------|-----|
-| 운영 | https://cxr542-launcher.vercel.app |
+| 운영 | https://cxr542-launcher-brown.vercel.app |
 | 로컬 | http://localhost:4321 |
 
 ## Purpose
@@ -27,15 +27,15 @@
 
 ## Active Apps
 
-### okestro-edu-tms
+### edu-team-tms
 
-- URL: https://okestro-edu-team-tms.vercel.app/?mode=edit&access=leader
+- URL: https://edu-team-tms-ten.vercel.app
 - 역할: 교육팀 운영, KPI, 업무일지, 향상 과제, 장부 관리 시스템
 - 상태: 운영 중
 
 ### cxr542-ai-portal
 
-- URL: https://cxr542-portal.vercel.app/
+- URL: https://cxr542-portal-ten.vercel.app/
 - 역할: 개인/팀 AI 포털
 - 상태: 운영 중, 다음 개선 대상
 
@@ -94,7 +94,7 @@
 
 ## iPhone Home Screen
 
-1. iPhone에서 Safari로 https://cxr542-launcher.vercel.app 접속
+1. iPhone에서 Safari로 https://cxr542-launcher-brown.vercel.app 접속
 2. 하단 공유 버튼 선택
 3. **홈 화면에 추가** 선택
 4. 이름을 `cxr542-ai-workspace` 또는 `AI workspace`로 저장
