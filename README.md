@@ -27,9 +27,9 @@
 
 ## Active Apps
 
-### okestro-edu-tms
+### edu-team-tms
 
-- URL: https://okestro-edu-team-tms.vercel.app/?mode=edit&access=leader
+- URL: https://edu-team-tms-ten.vercel.app
 - 역할: 교육팀 운영, KPI, 업무일지, 향상 과제, 장부 관리 시스템
 - 상태: 운영 중
 
